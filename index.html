@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no"
+    />
+    <meta name="theme-color" content="#04182c" />
+    <title>Underwater — an interactive deep-sea gallery</title>
+    <meta
+      name="description"
+      content="Underwater is a real-time WebGL gallery on the sea floor: drift along a guided route or swim freely among sculptures, fish and falling light."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!--
+      Critical preloader styles are inlined so the loading orb renders before the
+      JS bundle is parsed. The orb is driven by window.__underwaterLoader (see
+      src/core/Preloader.ts), which the app updates with real build progress.
+    -->
+    <style>
+      html, body { margin: 0; padding: 0; height: 100%; background: #04182c; overflow: hidden; }
+      #preloader {
+        position: fixed; inset: 0; z-index: 1000;
+        display: grid; place-items: center;
+        background:
+          radial-gradient(120% 90% at 50% 0%, #0d4a73 0%, #072c4a 45%, #031426 100%);
+        transition: opacity 0.9s ease, visibility 0.9s;
+      }
+      #preloader.is-done { opacity: 0; visibility: hidden; pointer-events: none; }
+      #preloader .orb {
+        position: relative; width: 168px; aspect-ratio: 1; border-radius: 50%; overflow: hidden;
+        background: radial-gradient(circle at 32% 24%, #d6fbff70 0 3%, #6cc6d455 6%, #0b6f9a38 48%, #04294e88 70%, #02334dd0 90%);
+        outline: 1px solid #5ad2f6;
+        animation: orb-halo 3s linear infinite;
+      }
+      #preloader .orb::after {
+        content: ''; position: absolute; inset: 0; border-radius: 50%;
+        box-shadow: inset 0 0 10px #3fd0ff, inset 0 -18px 40px #00142a80;
+      }
+      #preloader .fill {
+        position: absolute; inset: 0; transform: translateY(100%);
+        background: linear-gradient(to bottom, #12d8ff40, #3ae6ffd0);
+      }
+      #preloader .wave { position: absolute; bottom: 100%; width: 200%; height: 18px; }
+      #preloader .wave.back { right: 0; fill: #c9fff044; animation: wave-r 1.6s linear infinite; }
+      #preloader .wave.front { left: 0; fill: #12d8ff55; margin-bottom: -1px; animation: wave-l 0.85s linear infinite; }
+      #preloader .pct {
+        position: absolute; inset: 0; display: grid; place-items: center; z-index: 2;
+        color: #fff; font: 400 1.9rem/1 'Cinzel', Georgia, serif; letter-spacing: 0.04em;
+        text-shadow: 0 1px 8px #00365a;
+      }
+      #preloader .caption {
+        position: absolute; left: 0; right: 0; bottom: calc(50% - 150px); text-align: center;
+        color: #9fdcf2; font: 400 0.72rem/1 Georgia, serif; letter-spacing: 0.4em; text-transform: uppercase; opacity: 0.7;
+      }
+      @keyframes wave-l { to { transform: translateX(-50%); } }
+      @keyframes wave-r { to { transform: translateX(50%); } }
+      @keyframes orb-halo {
+        0%   { box-shadow: 0 -6px 6px #2ff8f040, 0 0 22px #8ffbf870; }
+        25%  { box-shadow: 6px 0 6px #2ff8f040, 0 0 22px #8ffbf870; }
+        50%  { box-shadow: 0 6px 6px #2ff8f040, 0 0 22px #8ffbf870; }
+        75%  { box-shadow: -6px 0 6px #2ff8f040, 0 0 22px #8ffbf870; }
+        100% { box-shadow: 0 -6px 6px #2ff8f040, 0 0 22px #8ffbf870; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="preloader" aria-live="polite" aria-label="Loading">
+      <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <!-- one wavelength repeated twice so a -50% translate loops seamlessly -->
+        <symbol id="uw-wave" viewBox="0 0 400 18">
+          <path d="M0 9 Q50 0 100 9 T200 9 T300 9 T400 9 V18 H0 Z" />
+        </symbol>
+      </svg>
+      <div class="orb">
+        <div class="fill" id="preloader-fill">
+          <svg class="wave back" viewBox="0 0 400 18" preserveAspectRatio="none"><use href="#uw-wave" /></svg>
+          <svg class="wave front" viewBox="0 0 400 18" preserveAspectRatio="none"><use href="#uw-wave" /></svg>
+        </div>
+        <div class="pct" id="preloader-pct">0%</div>
+      </div>
+      <div class="caption">Descending</div>
+    </div>
+    <div id="app"></div>
+    <script>
+      // Tiny pre-bundle loader: creeps forward on its own so the orb is alive while the
+      // bundle downloads, then follows real progress once the app reports it.
+      (function () {
+        var state = { shown: 0, target: 6, running: true };
+        var pct = document.getElementById('preloader-pct');
+        var fill = document.getElementById('preloader-fill');
+        function tick() {
+          // ease toward the target, plus a slow drift so it never looks frozen
+          state.target = Math.min(99, state.target + (99 - state.target) * 0.0004);
+          state.shown += (state.target - state.shown) * 0.06;
+          var v = Math.min(100, state.shown);
+          pct.textContent = Math.floor(v) + '%';
+          fill.style.transform = 'translateY(' + (100 - v) + '%)';
+          if (state.running) requestAnimationFrame(tick);
+        }
+        window.__underwaterLoader = state;
+        tick();
+      })();
+    </script>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

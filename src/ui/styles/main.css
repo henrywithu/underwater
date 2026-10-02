@@ -1,0 +1,93 @@
+@import '@fontsource/cinzel/400.css';
+@import '@fontsource/cinzel/600.css';
+@import '@fontsource/bitter/300.css';
+@import '@fontsource/bitter/400.css';
+
+:root {
+  --ink: #eaf8ff;
+  --ink-dim: #a7d3e6;
+  --accent: #5ad2f6;
+  --accent-soft: #5ad2f633;
+  --panel: rgba(3, 22, 44, 0.42);
+  --panel-edge: rgba(120, 220, 255, 0.18);
+  --row: 2.4vh;
+  --vh: 1vh;
+  --gutter: clamp(16px, 2.4vw, 40px);
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-text: 'Bitter', Georgia, serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-water: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #04182c;
+  color: var(--ink);
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  height: calc(var(--vh) * 100);
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: var(--accent);
+}
+
+::selection {
+  background: var(--accent);
+  color: #02142a;
+}
+
+/* custom cursor replaces the system one on pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  .uw-has-cursor,
+  .uw-has-cursor * {
+    cursor: none !important;
+  }
+}
+
+/* shared scrollbar for text panels */
+.uw-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+.uw-scroll::-webkit-scrollbar {
+  width: 2px;
+}
+.uw-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
