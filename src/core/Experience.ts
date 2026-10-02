@@ -31,7 +31,13 @@ import { canyonCenter } from '@/scene/world/Terrain';
 import { device } from './Device';
 import { actions, store, type SectionId } from './store';
 
-const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
+/** Yield to the browser: next frame, or a short timeout if the tab is in the background. */
+const nextFrame = () =>
+  new Promise<void>((r) => {
+    const done = () => { clearTimeout(t); r(); };
+    const t = setTimeout(done, 60);
+    requestAnimationFrame(done);
+  });
 
 /**
  * Builds and runs the 3D experience. The Vue layer talks to it only through the store
@@ -126,14 +132,14 @@ export class Experience {
       actions.setLoading(progress);
       await nextFrame();
     }
-    // compile every shader before revealing the scene
-    await this.scene.whenReadyAsync();
-    actions.setLoading(1);
-
+    // Start rendering underneath the preloader: readiness is evaluated by the render
+    // loop, and the first frames compile every shader before the scene is revealed.
     this.input.onTap = (x, y) => this.handleTap(x, y);
     window.addEventListener('underwater:shaders-updated', this.onShaders);
     window.addEventListener('resize', this.onResize);
     this.engine.runRenderLoop(() => this.frame());
+    await this.scene.whenReadyAsync();
+    actions.setLoading(1);
   }
 
   private frame() {

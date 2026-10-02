@@ -1,4 +1,7 @@
 import { Effect } from '@babylonjs/core/Materials/effect';
+// Babylon built-in includes referenced by our instanced shaders (rock, fish, godrays)
+import '@babylonjs/core/Shaders/ShadersInclude/instancesDeclaration';
+import '@babylonjs/core/Shaders/ShadersInclude/instancesVertex';
 
 import uwNoise from './includes/uwNoise.glsl?raw';
 import uwCaustics from './includes/uwCaustics.glsl?raw';

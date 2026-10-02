@@ -6,8 +6,8 @@ export const PALETTE = {
   fogNear: new Color3(0.07, 0.36, 0.52),
   fogDeep: new Color3(0.01, 0.07, 0.2),
   surface: new Color3(0.55, 0.9, 1.0),
-  sand: new Color3(0.58, 0.62, 0.55),
-  sandDark: new Color3(0.32, 0.38, 0.36),
+  sand: new Color3(0.5, 0.56, 0.52),
+  sandDark: new Color3(0.28, 0.34, 0.33),
   rock: new Color3(0.2, 0.22, 0.25),
   algae: new Color3(0.2, 0.32, 0.22),
   stone: new Color3(0.56, 0.58, 0.56),
@@ -19,4 +19,4 @@ export const PALETTE = {
   sunDir: new Vector3(0.25, 1, -0.35).normalize(),
 };
 
-export const FOG_DENSITY = 0.022;
+export const FOG_DENSITY = 0.03;

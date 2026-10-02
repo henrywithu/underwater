@@ -92,7 +92,7 @@
         var fill = document.getElementById('preloader-fill');
         function tick() {
           // ease toward the target, plus a slow drift so it never looks frozen
-          state.target = Math.min(99, state.target + (99 - state.target) * 0.0004);
+          if (state.target < 99) state.target = Math.min(99, state.target + (99 - state.target) * 0.0004);
           state.shown += (state.target - state.shown) * 0.06;
           var v = Math.min(100, state.shown);
           pct.textContent = Math.floor(v) + '%';

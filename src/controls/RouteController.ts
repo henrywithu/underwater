@@ -37,13 +37,13 @@ export class RouteController implements CameraController {
         const dz = z - s.position.z;
         const w = Math.exp(-(dz * dz) / 120);
         const side = s.info.position[0] >= 0 ? -1 : 1;
-        x += w * (s.position.x + side * (s.built.radius + 5) - x);
+        x += w * (s.position.x + side * (s.built.radius + 8) - x);
       }
       const floor = Math.max(terrainHeight(x, z), terrainHeight(x, z - 3));
       keys.push(new Vector3(x, floor + 3.2, z));
     }
     // ease into the first metres from slightly higher up: the descent at load
-    keys[0].y += 3;
+    keys[0].y += 1.5;
     const curve = Curve3.CreateCatmullRomSpline(keys, 12, false);
     this.points = curve.getPoints();
     this.path = new Path3D(this.points);
@@ -55,7 +55,7 @@ export class RouteController implements CameraController {
     let bestD = Infinity;
     for (let i = 0; i <= 400; i++) {
       const t = i / 400;
-      const d = Vector3.DistanceSquared(this.path.getPointAt(t), p);
+      const d = Vector3.DistanceSquared(this.path.getPointAt(t).clone(), p);
       if (d < bestD) { bestD = d; best = t; }
     }
     return best;
@@ -81,15 +81,16 @@ export class RouteController implements CameraController {
     this.progress = damp(this.progress, this.target, 2.2, dt);
     this.onProgress?.(this.progress);
 
-    const pos = this.path.getPointAt(this.progress);
+    // getPointAt returns Path3D's internal cached vector: always clone before mutating
+    const pos = this.path.getPointAt(this.progress).clone();
     // idle breathing: the camera gently bobs as if floating
     pos.y += Math.sin(this.time * 0.6) * 0.12;
     pos.x += Math.sin(this.time * 0.37) * 0.08;
     out.position.copyFrom(pos);
 
-    const ahead = this.path.getPointAt(Math.min(1, this.progress + 0.03));
-    const look = ahead.clone();
-    look.y -= 0.6;
+    const ahead = this.path.getPointAt(Math.min(1, this.progress + 0.06)).clone();
+    const look = ahead;
+    look.y -= 0.9;
     // attention: blend the look target toward the closest sculpture's centre
     let best: PlacedSculpture | null = null;
     let bestW = 0;

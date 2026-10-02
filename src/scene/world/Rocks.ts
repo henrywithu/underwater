@@ -17,8 +17,10 @@ function createBoulder(scene: Scene, seed: number): Mesh {
   for (let i = 0; i < pos.length; i += 3) {
     const x = pos[i], y = pos[i + 1], z = pos[i + 2];
     const n = fbm3(x * 1.4 + seed * 13.1, y * 1.4, z * 1.4 + seed * 3.7);
-    const ridges = Math.abs(fbm3(x * 3 + seed, y * 3, z * 3) - 0.5) * 0.5;
-    let r = 0.65 + n * 0.75 + ridges;
+    // ridged noise carves sharp creases, the quantised term gives ledge-like facets
+    const ridges = (1 - Math.abs(fbm3(x * 2.6 + seed, y * 2.6, z * 2.6) * 2 - 1)) * 0.35;
+    const ledges = Math.round(y * 4 + n * 2) / 4 - y;
+    let r = 0.6 + n * 0.8 + ridges + ledges * 0.12;
     // flatter bottoms so boulders sit in the sand
     const ny = y < -0.3 ? -0.3 + (y + 0.3) * 0.35 : y;
     pos[i] = x * r;
@@ -47,13 +49,13 @@ export function createRocks(scene: Scene, material: Material, avoid: Vector3[]):
   // big cliff blocks lining the canyon walls
   for (let z = CANYON.zStart + 10; z > CANYON.zEnd - 20; z -= 3.2) {
     for (const side of [-1, 1]) {
-      for (let k = 0; k < 2; k++) {
-        const off = CANYON.halfWidth + 2 + rng() * 14 + k * 6;
+      for (let k = 0; k < 3; k++) {
+        const off = CANYON.halfWidth + rng() * 12 + k * 7;
         const x = canyonCenter(z) + side * off;
         const zz = z + (rng() - 0.5) * 3;
-        const s = 2.5 + rng() * 5 + k * 2;
-        const y = terrainHeight(x, zz) - s * 0.25;
-        push(x, y, zz, s * (0.8 + rng() * 0.6), s, s * (0.8 + rng() * 0.6));
+        const s = 2.5 + rng() * 4.5 + k * 2.2;
+        const y = terrainHeight(x, zz) - s * 0.3;
+        push(x, y, zz, s * (0.8 + rng() * 0.6), s * (1.1 + rng() * 0.9), s * (0.8 + rng() * 0.6));
       }
     }
   }
@@ -63,11 +65,13 @@ export function createRocks(scene: Scene, material: Material, avoid: Vector3[]):
     const x = canyonCenter(z) + (rng() - 0.5) * CANYON.halfWidth * 2.2;
     const s = 0.2 + Math.pow(rng(), 3) * 1.8;
     if (tooClose(x, z, s)) continue;
-    push(x, terrainHeight(x, z) - s * 0.2, z, s, s * (0.6 + rng() * 0.5), s);
+    // tumbled stones: any orientation, so the flattened base doesn't always face down
+    push(x, terrainHeight(x, z) - s * 0.35, z, s, s * (0.6 + rng() * 0.5), s * (0.7 + rng() * 0.6), true);
   }
 
-  function push(x: number, y: number, z: number, sx: number, sy: number, sz: number) {
-    const q = Quaternion.FromEulerAngles((rng() - 0.5) * 0.4, rng() * Math.PI * 2, (rng() - 0.5) * 0.4);
+  function push(x: number, y: number, z: number, sx: number, sy: number, sz: number, tumble = false) {
+    const tilt = tumble ? Math.PI : 0.4;
+    const q = Quaternion.FromEulerAngles((rng() - 0.5) * tilt, rng() * Math.PI * 2, (rng() - 0.5) * tilt);
     const m = Matrix.Compose(new Vector3(sx, sy, sz), q, new Vector3(x, y, z));
     buckets[Math.floor(rng() * variants.length)].push(m);
   }

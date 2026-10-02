@@ -62,7 +62,8 @@ export function createTerrain(scene: Scene, material: Material): Mesh {
       const b = a + 1;
       const c = a + row;
       const d = c + 1;
-      indices.push(a, c, b, b, c, d);
+      // winding chosen so normals point up (+y) in Babylon's left-handed space
+      indices.push(a, b, c, b, d, c);
     }
   }
   const normals: number[] = [];

@@ -26,6 +26,7 @@ let stopRouter: (() => void) | null = null;
 onMounted(async () => {
   const exp = new Experience(canvas.value!);
   experience.value = exp;
+  if (import.meta.env.DEV) (window as unknown as { __uw: Experience }).__uw = exp;
   const untrack = trackPreloader();
   await exp.init();
   untrack();

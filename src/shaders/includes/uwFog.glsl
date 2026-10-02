@@ -15,6 +15,6 @@ vec3 uwApplyFog(vec3 color, vec3 worldPos) {
   float dist = length(worldPos - uCameraPos);
   float extinction = 1.0 - exp(-pow(dist * uFogDensity, 1.35));
   // red is absorbed first, blue last: tint the lit colour before fogging
-  vec3 absorbed = color * exp(-dist * vec3(0.060, 0.022, 0.014));
+  vec3 absorbed = color * exp(-dist * vec3(0.085, 0.032, 0.018));
   return mix(absorbed, uwWaterColor(worldPos), clamp(extinction, 0.0, 1.0));
 }
