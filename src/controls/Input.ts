@@ -30,7 +30,7 @@ export class Input {
   private pointers = new Map<number, { x: number; y: number; startX: number; startY: number; moved: number }>();
   private disposers: (() => void)[] = [];
 
-  constructor(private el: HTMLElement) {
+  constructor(el: HTMLElement) {
     this.listen(window, 'keydown', (e: KeyboardEvent) => {
       if ((e.target as HTMLElement)?.closest?.('input, textarea')) return;
       this.keys.add(e.code);

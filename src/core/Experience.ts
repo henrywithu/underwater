@@ -40,7 +40,7 @@ const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()
 export class Experience {
   readonly engine: Engine;
   scene!: Scene;
-  private input!: Input;
+  input!: Input;
   private materials!: MaterialLibrary;
   private garden!: SculptureGarden;
   private schools: FishSchool[] = [];

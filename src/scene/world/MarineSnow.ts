@@ -4,7 +4,6 @@ import { BoxParticleEmitter } from '@babylonjs/core/Particles/EmitterTypes/boxPa
 import { Color4 } from '@babylonjs/core/Maths/math.color';
 import { Vector3 } from '@babylonjs/core/Maths/math.vector';
 import type { Scene } from '@babylonjs/core/scene';
-import type { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh';
 import type { Camera } from '@babylonjs/core/Cameras/camera';
 
 /** Soft round sprite drawn at runtime: no texture file needed. */
@@ -29,10 +28,10 @@ function createDotTexture(scene: Scene, size = 64, hardness = 0.35) {
  */
 export class MarineSnow {
   private systems: ParticleSystem[] = [];
-  private anchor: { position: Vector3 };
+  private anchor: Vector3;
 
   constructor(scene: Scene, private camera: Camera, lowPower: boolean) {
-    this.anchor = { position: camera.globalPosition.clone() };
+    this.anchor = camera.globalPosition.clone();
     const dot = createDotTexture(scene);
     const soft = createDotTexture(scene, 64, 0.05);
 
@@ -53,7 +52,8 @@ export class MarineSnow {
   ) {
     const ps = new ParticleSystem(name, capacity, scene);
     ps.particleTexture = texture;
-    ps.emitter = this.anchor as unknown as AbstractMesh;
+    // a Vector3 emitter is shared by reference, so moving it moves the emission box
+    ps.emitter = this.anchor;
     const emitter = new BoxParticleEmitter();
     emitter.minEmitBox = new Vector3(-o.box, -o.box * 0.6, -o.box);
     emitter.maxEmitBox = new Vector3(o.box, o.box * 0.6, o.box);
@@ -86,7 +86,7 @@ export class MarineSnow {
   }
 
   update() {
-    this.anchor.position.copyFrom(this.camera.globalPosition);
+    this.anchor.copyFrom(this.camera.globalPosition);
   }
 
   dispose() {

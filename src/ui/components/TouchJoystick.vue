@@ -8,7 +8,7 @@ const state = ref({ active: false, ox: 0, oy: 0, x: 0, y: 0 });
 let raf = 0;
 
 function tick() {
-  const j = (exp.value as unknown as { input?: { joystick: typeof state.value & { originX: number; originY: number } } })?.input?.joystick;
+  const j = exp.value?.input?.joystick;
   if (j) state.value = { active: j.active, ox: j.originX, oy: j.originY, x: j.x, y: j.y };
   raf = requestAnimationFrame(tick);
 }
